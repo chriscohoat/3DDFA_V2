@@ -15,7 +15,7 @@ from utils.depth import depth
 from utils.pncc import pncc
 from utils.uv import uv_tex
 from utils.pose import viz_pose
-from utils.serialization import ser_to_ply, ser_to_obj
+from utils.serialization import ser_to_ply, ser_to_obj, ser_to_simple_obj
 from utils.functions import draw_landmarks, get_suffix
 from utils.tddfa_util import str2bool
 
@@ -55,7 +55,10 @@ def main(args):
     # Visualization and serialization
     dense_flag = args.opt in ('2d_dense', '3d', 'depth', 'pncc', 'uv_tex', 'ply', 'obj')
     old_suffix = get_suffix(args.img_fp)
-    new_suffix = f'.{args.opt}' if args.opt in ('ply', 'obj') else '.jpg'
+    if args.opt == 'simple_obj':
+        new_suffix = f'.obj'
+    else:
+        new_suffix = f'.{args.opt}' if args.opt in ('ply', 'obj') else '.jpg'
 
     wfp = f'examples/results/{args.img_fp.split("/")[-1].replace(old_suffix, "")}_{args.opt}' + new_suffix
 
@@ -83,7 +86,7 @@ def main(args):
     elif args.opt == 'obj':
         ser_to_obj(img, ver_lst, tddfa.tri, height=img.shape[0], wfp=wfp)
     elif args.opt == 'simple_obj':
-        ser_to_obj(img, ver_lst, tddfa.tri, height=img.shape[0], wfp=wfp)
+        ser_to_simple_obj(img, ver_lst, tddfa.tri, height=img.shape[0], wfp=wfp)
     else:
         raise ValueError(f'Unknown opt {args.opt}')
 
