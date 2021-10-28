@@ -109,13 +109,22 @@ def plot_image(img):
     plt.show()
 
 
-def draw_landmarks(img, pts, style='fancy', wfp=None, show_flag=False, **kwargs):
-    """Draw landmarks using matplotlib"""
-    height, width = img.shape[:2]
-    plt.figure(figsize=(12, height / width * 12))
-    plt.imshow(img[..., ::-1])
-    plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
-    plt.axis('off')
+def draw_landmarks(img, pts, style='fancy', wfp=None, show_flag=False, three_d=False, **kwargs):
+
+    fig = plt.figure()
+
+    if three_d:
+        ax = fig.add_subplot(projection='3d')
+        ax.set_xlabel('X Label')
+        ax.set_ylabel('Y Label')
+        ax.set_zlabel('Z Label')
+    else:
+        plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+        height, width = img.shape[:2]
+        plt.figure(figsize=(12, height / width * 12))
+        plt.imshow(img[..., ::-1])
+        plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+        plt.axis('off')
 
     dense_flag = kwargs.get('dense_flag')
 
@@ -123,34 +132,59 @@ def draw_landmarks(img, pts, style='fancy', wfp=None, show_flag=False, **kwargs)
         pts = [pts]
     for i in range(len(pts)):
         if dense_flag:
-            plt.plot(pts[i][0, ::6], pts[i][1, ::6], 'o', markersize=0.4, color='c', alpha=0.7)
+            if three_d:
+                plt.plot(pts[i][0, ::6], pts[i][1, ::6], pts[i][2, ::6], 'o', markersize=0.4, color='c', alpha=0.7)
+            else:
+                plt.plot(pts[i][0, ::6], pts[i][1, ::6], 'o', markersize=0.4, color='c', alpha=0.7)
         else:
             alpha = 0.8
             markersize = 4
             lw = 1.5
             color = kwargs.get('color', 'w')
+            color = 'red'
             markeredgecolor = kwargs.get('markeredgecolor', 'black')
 
             nums = [0, 17, 22, 27, 31, 36, 42, 48, 60, 68]
 
+            # point groupings:
+            # jaw, right eyebrow, left eyebrow, nose vertical, nose bottom, right eye, left eye, lips boundary, inner lips
+
             # close eyes and mouths
             plot_close = lambda i1, i2: plt.plot([pts[i][0, i1], pts[i][0, i2]], [pts[i][1, i1], pts[i][1, i2]],
                                                  color=color, lw=lw, alpha=alpha - 0.1)
-            plot_close(41, 36)
-            plot_close(47, 42)
-            plot_close(59, 48)
-            plot_close(67, 60)
+            #plot_close(41, 36)
+            #plot_close(47, 42)
+            #plot_close(59, 48)
+            #plot_close(67, 60)
+            print()
 
             for ind in range(len(nums) - 1):
+                print()
+                print('ind: {}'.format(ind))
                 l, r = nums[ind], nums[ind + 1]
-                plt.plot(pts[i][0, l:r], pts[i][1, l:r], color=color, lw=lw, alpha=alpha - 0.1)
-
-                plt.plot(pts[i][0, l:r], pts[i][1, l:r], marker='o', linestyle='None', markersize=markersize,
-                         color=color,
-                         markeredgecolor=markeredgecolor, alpha=alpha)
+                print('x: {}'.format(pts[i][0, l:r]))
+                print('y: {}'.format(pts[i][1, l:r]))
+                print('z: {}'.format(pts[i][2, l:r]))
+                if three_d:
+                    # Connecting lines
+                    plt.plot(pts[i][0, l:r], pts[i][1, l:r], pts[i][2, l:r], color=color, lw=lw, alpha=alpha - 0.1)
+                    # Individual points
+                    plt.plot(pts[i][0, l:r], pts[i][1, l:r], pts[i][2, l:r], marker='o', linestyle='None', markersize=markersize,
+                            color=color,
+                            markeredgecolor=markeredgecolor, alpha=alpha)
+                else:
+                    # Connecting lines
+                    plt.plot(pts[i][0, l:r], pts[i][1, l:r], color=color, lw=lw, alpha=alpha - 0.1)
+                    # Individual points
+                    plt.plot(pts[i][0, l:r], pts[i][1, l:r], marker='o', linestyle='None', markersize=markersize,
+                            color=color,
+                            markeredgecolor=markeredgecolor, alpha=alpha)
     if wfp is not None:
         plt.savefig(wfp, dpi=150)
         print(f'Save visualization result to {wfp}')
+
+    if three_d:
+        ax.view_init(110, 87)
 
     if show_flag:
         plt.show()
