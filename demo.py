@@ -15,7 +15,7 @@ from utils.depth import depth
 from utils.pncc import pncc
 from utils.uv import uv_tex
 from utils.pose import viz_pose
-from utils.serialization import ser_to_ply, ser_to_obj, ser_to_simple_obj
+from utils.serialization import ser_to_ply, ser_to_obj, ser_to_simple_obj_multiple
 from utils.functions import draw_landmarks, get_suffix
 from utils.tddfa_util import str2bool
 
@@ -86,7 +86,7 @@ def main(args):
     elif args.opt == 'obj':
         ser_to_obj(img, ver_lst, tddfa.tri, height=img.shape[0], wfp=wfp)
     elif args.opt == 'simple_obj':
-        ser_to_simple_obj(img, ver_lst, tddfa.tri, height=img.shape[0], wfp=wfp)
+        ser_to_simple_obj_multiple(img, param_lst, ver_lst, tddfa.tri, height=img.shape[0], wfp=wfp)
     else:
         raise ValueError(f'Unknown opt {args.opt}')
 
